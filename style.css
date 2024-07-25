@@ -1,0 +1,27 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    background-color: rgb(215, 225, 234);
+}
+.board{
+    height: 600px;
+    width: 600px;
+    background-color: white;
+    margin: auto;
+    margin-top: 50px;
+    display: flex;
+    flex-wrap: wrap;
+    
+}
+.sell{
+    border: 1px solid black;
+    background-color:rgb(255, 255, 255);
+    width: 200px;
+    height: auto;
+}
+.start{
+    padding: 50px;
+}
