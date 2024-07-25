@@ -1,4 +1,5 @@
 const Gameboard = (() => {
+    
     var board = [];    
 
     function Sell(){
