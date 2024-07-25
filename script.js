@@ -1,81 +1,116 @@
-const Gameboard = (() => {
+const DOM = (() => {
+    const startBtn = document.querySelector('.start');
+    const menuBtn = document.querySelector('.menu');
+    const restartBtn = document.querySelector('.restart');
+    const playerName = document.querySelector('.player');
+
+    const init = () =>{
+        startBtn.onclick = () => Logic.startGame();
+        menuBtn.onclick = () => Logic.backToMenu();
+        restartBtn.onclick = () => Logic.startGame();
+    }
     
+    init();
+
+    return {
+        board: document.querySelector('.board'),
+        sellDOM: function(){
+            const sell = document.createElement('div');
+            sell.className = 'sell';
+            return sell;
+        },
+        displayMark: function(mark, place){
+            const h1mark = document.createElement('h1');
+            h1mark.textContent = mark;
+            place.appendChild(h1mark);
+        },
+        startBtn,
+        restartBtn,
+        menuBtn,
+        playerName,
+    }
+})();
+
+const Gameboard = (() => {
     var board = [];    
 
     function Sell(){
-        this.dom = document.createElement('div');
-        this.dom.className = "sell";
+        this.dom = DOM.sellDOM();
         this.mark = '';
 
         this.setMark = function(mark){
             this.mark = mark;
         }
         
-        const _showMark = () => {
-            const hh = document.createElement('h1');
-            hh.textContent = this.mark;
-            this.dom.appendChild(hh);
-        }
-
         this.dom.addEventListener('click', () => {
             if (!this.dom.classList.contains('disabled')) {
                 Logic.makeMove(this);  
-                _showMark();
+                DOM.displayMark(this.mark, this.dom);
+                console.log(board);
             }
         });
     }
 
-    const boardDOM = document.querySelector('.board');
-    
     const getBoard = () => {
         return board;
     }
 
     const refillBoard = () => {
-        boardDOM.innerHTML = '';
+        DOM.board.innerHTML = '';
         board = []; 
         for (let i = 0; i < 9; i++){
             const sell = new Sell();
-            boardDOM.appendChild(sell.dom);
+            DOM.board.appendChild(sell.dom);
             board.push(sell);
         }
     }
-
+    const init = () => {
+        DOM.board.style.cssText = 'display: flex';
+        refillBoard();
+    }
     return {
         getBoard,
         refillBoard,
         Sell,
-        board
+        init,
     }
 })();
-console.log(Gameboard.getBoard());
 
 const Logic = (() => {
-    function Player(mark){
+    function Player(mark, name){
         this.mark = mark;
+        this.name = name;
     }
 
-    const player1 = new Player('X');
-    const player2 = new Player('O');
+    const player1 = new Player('X', 'Player 1');
+    const player2 = new Player('O', 'Player 2');
 
-    let turn = 'player 1';
-
+    let turn = player1.name;
+    const _changeTurn = () => {
+        if (turn === player1.name) {
+            turn = player2.name;
+        } else {
+            turn = player1.name;
+        }
+    }
     const makeMove = (sell) => {
         if (sell.mark === '') {  
-            if (turn === 'player 1') {
+            if (turn === player1.name) {
                 sell.setMark(player1.mark);
-                turn = 'player 2';
+                _changeTurn();
             } else {
                 sell.setMark(player2.mark);
-                turn = 'player 1';
+                _changeTurn();
             }
             lockElement(sell, 'single');
         }
+        DOM.playerName.textContent = turn;
         if (checkWinner()) {
             lockElement(Gameboard.getBoard(), 'all');
-            console.log(turn, ' wins');
+            _changeTurn();
+            DOM.playerName.textContent = `${turn} wins!`;
         } else if (boardFull()) {
-            console.log("It's a tie");
+            DOM.playerName.textContent = "It's a tie!";
         }
     }
 
@@ -98,7 +133,7 @@ const Logic = (() => {
         [1, 4, 7],
         [2, 5, 8],
         [0, 4, 8],
-        [2, 4, 6]
+        [2, 4, 6],
     ];
 
     const checkWinner = () => {
@@ -114,14 +149,27 @@ const Logic = (() => {
         return board.every(sell => sell.mark !== '');
     }
 
-    const startBtn = document.querySelector('.start');
-    startBtn.addEventListener('click', () => {
-        Gameboard.refillBoard();
-        turn = 'player 1';
-    });
+    const startGame = () => {
+        Gameboard.init();
+        turn = player1.name;
+        DOM.playerName.textContent = turn;
+        DOM.playerName.style.cssText = 'display: flex';
+        DOM.startBtn.style.cssText = 'display: none';
+        DOM.menuBtn.style.cssText = 'display: flex';
+        DOM.restartBtn.style.cssText = 'display: flex';
+    }
 
+    const backToMenu = () => {
+        DOM.board.style.cssText = 'display: none';
+        DOM.startBtn.style.cssText = 'display: flex';
+        DOM.menuBtn.style.cssText = 'display: none';
+        DOM.restartBtn.style.cssText = 'display: none';
+        DOM.playerName.style.cssText = 'display: none';
+    }
     return {
         makeMove,
         lockElement,
+        startGame,
+        backToMenu,
     }
 })();

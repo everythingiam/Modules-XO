@@ -14,7 +14,7 @@ body{
     margin-top: 50px;
     display: flex;
     flex-wrap: wrap;
-    
+    display: none;
 }
 .sell{
     border: 1px solid black;
@@ -24,4 +24,13 @@ body{
 }
 .start{
     padding: 60px;
+}
+.menu{
+    display: none;
+}
+.restart{
+    display: none;
+}
+.player{
+    display: none;
 }
